@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL avec volume persistant
+  db:
+    image: postgres:15-alpine
+    container_name: vitalsync_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vitalsync_network
+    # Le volume persistant évite la perte de données après un "docker-compose down"
+
+  # API Backend Node.js
+  backend:
+    build: ./backend
+    container_name: vitalsync_api
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+    networks:
+      - vitalsync_network
+    expose:
+      - "3000"
+
+  # Frontend Nginx proxy
+  frontend:
+    build: ./frontend
+    container_name: vitalsync_front
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - vitalsync_network
+
+networks:
+  # Réseau pont (bridge) personnalisé pour isoler les conteneurs
+  vitalsync_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

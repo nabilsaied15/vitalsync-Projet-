@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vitalsync-backend-service
+spec:
+  # ClusterIP : Expose le service en interne dans le cluster
+  type: ClusterIP
+  selector:
+    app: vitalsync-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

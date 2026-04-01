@@ -1,0 +1,7 @@
+# .dockerignore
+# Eviter de copier les modules locaux dans l'image (ils seront réinstallés)
+node_modules
+# Eviter les fichiers système inutiles et secrets
+.env
+npm-debug.log
+.git
